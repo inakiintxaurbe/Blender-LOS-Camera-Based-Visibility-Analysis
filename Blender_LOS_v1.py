@@ -51,7 +51,7 @@ if camera is None:
 
 panel = bpy.data.objects.get(PANEL_OBJECT_NAME)
 if panel is None or panel.type != 'MESH':
-    raise RuntimeError("The panel does not exist or is not a mesh!!! (OR ITS NOT NAMED AS "Target_Panel"!!!)")
+    raise RuntimeError("The panel does not exist or is not a mesh!!! (OR ITS NOT NAMED AS -Target_Panel-!!!)")
 
 depsgraph = bpy.context.evaluated_depsgraph_get()
 panel_eval = panel.evaluated_get(depsgraph)
