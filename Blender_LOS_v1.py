@@ -1,4 +1,5 @@
-# BLENDER_LOS_V1.py  (a Python code to make visibility analyses in Blender)
+# BLENDER_LOS_V1.py  
+# a Python code to make visibility analyses in Blender
 # Designed by: I. Intxaurbe (https://github.com/inakiintxaurbe)
 #   Department of Graphic Design and Engineering Projects
 #   (Universidad del País Vasco/Euskal Herriko Unibertsitatea)
@@ -29,29 +30,20 @@ from mathutils import Vector
 
 
 
-# CONFIGURATION / EZARPENAK
+# CONFIGURATION / EZARPENAK -------------------------------------
 
-PANEL_OBJECT_NAME = "Target_Panel"  # ← CHANGE THIS TO NAME AS "Target_Panel" / IZENA "Target_Panel" IZAN BEHAR DAU!!! (IMPORTANT!!!)
-POINT_DENSITY_CM = 3.0          # approximate separation between points (cm) / puntuen arteko gutxi gorabeherako tartea (cm)
-H_FOV_DEG = 110.0               # horizontal human visual field / giza ikuseremu horizontala
-V_FOV_DEG = 90.0                # vertical human visual field / giza ikuseremu bertikala
-MAX_DISTANCE_M = 50.0           # maximum analysis distance / aztertzeko gehienezko distantzia
+PANEL_OBJECT_NAME = "Target_Panel"  
+POINT_DENSITY_CM = 3.0          
+H_FOV_DEG = 110.0               
+V_FOV_DEG = 90.0                
+MAX_DISTANCE_M = 50.0           
 COLOR_VISIBLE = (0.1, 0.8, 0.1, 1.0)
 COLOR_HIDDEN = (0.8, 0.1, 0.1, 1.0)
 COLOR_OUTSIDE = (0.5, 0.5, 0.5, 1.0)
 
-
-
-# UTILITIES / ERABILGARRITASUNAK
-
 scene = bpy.context.scene
 camera = scene.camera
-if camera is None:
-    raise RuntimeError("There is no active camera in the scene!!!")
-
 panel = bpy.data.objects.get(PANEL_OBJECT_NAME)
-if panel is None or panel.type != 'MESH':
-    raise RuntimeError("The panel does not exist or is not a mesh!!! (OR ITS NOT NAMED AS -Target_Panel-!!!)")
 
 depsgraph = bpy.context.evaluated_depsgraph_get()
 panel_eval = panel.evaluated_get(depsgraph)
@@ -67,8 +59,7 @@ output_dir = bpy.path.abspath("//")
 csv_path = output_dir + "panel_visibility.csv"
 
 
-
-# COLORING MATERIALS RESULTS / EMAITZAK KOLOREZTATZEKO MATERIALA
+# FUNCTIONS / FUNTZIOAK -----------------------------------
 
 def make_material(name, color):
     mat = bpy.data.materials.new(name)
@@ -76,6 +67,9 @@ def make_material(name, color):
     bsdf = mat.node_tree.nodes["Principled BSDF"]
     bsdf.inputs["Base Color"].default_value = color
     return mat
+
+
+# COLOURS (MATERIALS) / KOLOREAK (MATERIALAK) ---------------
 
 mat_visible = make_material("VISIBLE", COLOR_VISIBLE)
 mat_hidden = make_material("NO_VISIBLE", COLOR_HIDDEN)
@@ -87,8 +81,7 @@ panel.data.materials.append(mat_hidden)
 panel.data.materials.append(mat_outside)
 
 
-
-# SANPLING BY DENSITY / DENTSITATEAGAZ LAGINKETA
+# VISIBILITY ANALYSIS / IKUSGARRITASUN ANALISIA -------------
 
 bm = bmesh.new()
 bm.from_mesh(mesh)
@@ -162,9 +155,6 @@ for idx, (local_point, face_index) in enumerate(points):
 })
 
 
-
-# SAVE RESULTS IN CSV / CSV-AN GORDE EMAITZAK
-
 for r in results:
     fi = r["face_index"]
     if fi < len(panel.data.polygons):
@@ -176,6 +166,3 @@ with open(csv_path, "w", newline="", encoding="utf-8") as f:
     writer.writerows(results)
 
 panel_eval.to_mesh_clear()
-
-print("Análisis completado.")
-print(f"Resultados guardados en: {csv_path}")
