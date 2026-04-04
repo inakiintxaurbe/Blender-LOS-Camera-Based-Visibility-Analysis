@@ -146,24 +146,22 @@ def render_current_view(filepath):
     bpy.ops.render.render(write_still=True)
 
 
-def render_camera_pose(camera_obj, filepath, yaw_deg=None):
-    """
-    Renders the current camera pose, optionally applying a temporary yaw
-    rotation around the camera's local up axis.
-    """
-    original_matrix = camera_obj.matrix_world.copy()
+def render_camera_pose(camera_obj, filepath, yaw_deg=0):
+    original_rot_mode = camera_obj.rotation_mode
+    original_rotation = camera_obj.rotation_euler.copy()
+    original_location = camera_obj.location.copy()
 
-    if yaw_deg is not None and yaw_deg != 0:
-        local_up_world = original_matrix.to_quaternion() @ Vector((0, 1, 0))
-        rot = Matrix.Rotation(math.radians(yaw_deg), 4, local_up_world)
-        new_matrix = rot @ original_matrix
-        camera_obj.matrix_world = new_matrix
+    camera_obj.rotation_mode = 'XYZ'
 
-        bpy.context.view_layer.update()
+    camera_obj.rotation_euler = original_rotation.copy()
+    camera_obj.rotation_euler.z += math.radians(yaw_deg)
 
+    bpy.context.view_layer.update()
     render_current_view(filepath)
 
-    camera_obj.matrix_world = original_matrix
+    camera_obj.location = original_location
+    camera_obj.rotation_euler = original_rotation
+    camera_obj.rotation_mode = original_rot_mode
     bpy.context.view_layer.update()
 
 
@@ -316,12 +314,28 @@ for idx, (local_point, face_index) in enumerate(points):
     })
 
 
+material_priority = {
+    0: 0,  
+    1: 1,  
+    2: 2,  
+    3: 3 
+}
 
 for r in results:
     fi = r["face_index"]
-    if fi < len(panel.data.polygons):
-        panel.data.polygons[fi].material_index = r["mat_index"]
+    mat = r["mat_index"]
 
+    if fi not in face_best_mat:
+        face_best_mat[fi] = mat
+    else:
+        current_mat = face_best_mat[fi]
+
+        if material_priority[mat] < material_priority[current_mat]:
+            face_best_mat[fi] = mat
+
+for fi, mat in face_best_mat.items():
+    if fi < len(panel.data.polygons):
+        panel.data.polygons[fi].material_index = mat
 
 if results:
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
