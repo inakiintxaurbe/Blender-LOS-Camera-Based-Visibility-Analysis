@@ -335,8 +335,8 @@ for r in results:
         if material_priority[mat] < material_priority[current_mat]:
             face_best_mat[fi] = mat
 
-if results: with open(csv_path, "w", newline="", encoding="utf-8") as f: writer = csv.DictWriter(f, fieldnames=results[0].keys()) writer.writeheader() writer.writerows(results)"
-
-for fi, mat in face_best_mat.items():
-    if fi < len(panel.data.polygons):
-        panel.data.polygons[fi].material_index = mat
+if results:
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=results[0].keys())
+        writer.writeheader()
+        writer.writerows(results)
