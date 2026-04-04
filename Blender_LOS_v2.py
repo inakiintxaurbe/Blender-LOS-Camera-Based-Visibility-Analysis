@@ -314,11 +314,13 @@ for idx, (local_point, face_index) in enumerate(points):
     })
 
 
+face_best_mat = {}
+
 material_priority = {
     0: 0,  
     1: 1,  
     2: 2,  
-    3: 3 
+    3: 3   
 }
 
 for r in results:
@@ -336,9 +338,3 @@ for r in results:
 for fi, mat in face_best_mat.items():
     if fi < len(panel.data.polygons):
         panel.data.polygons[fi].material_index = mat
-
-if results:
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=results[0].keys())
-        writer.writeheader()
-        writer.writerows(results)
