@@ -33,7 +33,7 @@ V_FOV_DEG = 40.0
 MAX_DISTANCE_M = 50.0
 
 USE_HEAD_ROTATION = True
-HEAD_YAW_ANGLES_DEG = [-45, -30, -15, 0, 15, 30, 45]
+HEAD_YAW_ANGLES_DEG = [-45, -30, -15, 15, 30, 45, 0]
 
 DO_RENDER = True
 RENDER_ENGINE = 'BLENDER_EEVEE_NEXT' 
@@ -46,7 +46,6 @@ COLOR_VISIBLE_YAW   = (0.5, 1.0, 0.5, 1.0)
 COLOR_HIDDEN        = (0.8, 0.1, 0.1, 1.0)   
 COLOR_OUTSIDE       = (0.5, 0.5, 0.5, 1.0)   
 
-
 scene = bpy.context.scene
 camera = scene.camera
 panel = bpy.data.objects.get(PANEL_OBJECT_NAME)
@@ -57,7 +56,6 @@ mesh = panel.data
 origin = camera.matrix_world.translation
 cam_rot = camera.matrix_world.to_quaternion()
 
-# Blender camera local axes
 cam_forward = (cam_rot @ Vector((0, 0, -1))).normalized()
 cam_right   = (cam_rot @ Vector((1, 0, 0))).normalized()
 cam_up      = (cam_rot @ Vector((0, 1, 0))).normalized()
@@ -335,6 +333,9 @@ for r in results:
         if material_priority[mat] < material_priority[current_mat]:
             face_best_mat[fi] = mat
 
+for poly in panel.data.polygons:
+    poly.material_index = 2
+    
 for fi, mat in face_best_mat.items():
     if fi < len(panel.data.polygons):
         panel.data.polygons[fi].material_index = mat
