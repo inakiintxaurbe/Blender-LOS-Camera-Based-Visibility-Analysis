@@ -79,5 +79,10 @@ Key parameters can be modified at the top of the script:
 POINT_DENSITY_CM = 3.0
 H_FOV_DEG = 110.0
 V_FOV_DEG = 90.0
-MAX_DISTANCE_M = 50.0```
+MAX_DISTANCE_M = 50.0
+```
+---
 
+## License
+
+AGPL-3.0 *(Citation of the author and repository is **mandatory**)*
